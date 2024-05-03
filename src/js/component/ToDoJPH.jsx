@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { LibManifestPlugin } from "webpack";
 
 
 export const ToDoJPH = () => {
@@ -21,7 +20,7 @@ export const ToDoJPH = () => {
             return
         }
         const data = await response.json()
-        setTodos(data)
+        setTodos(data.users)
     }
 
     useEffect(() => {
