@@ -27,12 +27,12 @@ export const ToDoJPH = () => {
         console.log(data.todos)
     }
 
-    const postTodo = async () => {
+/*     const postTodo = async () => {
         const uri = host + '/todos/';
         const options = {
             method: 'POST'
         };
-    }
+    } */
 
     const deteleTodo = async (item) => {
         const uri = `${host}/todos/${item.id}`;
@@ -45,10 +45,10 @@ export const ToDoJPH = () => {
             return
         }
         //const data = await response.json();
-        getTodos;
+        getTodos();
     }
 
-    const editTodo = async (item) => {
+/*     const editTodo = async (item) => {
         const uri = '';
         const options = {
 
@@ -60,7 +60,9 @@ export const ToDoJPH = () => {
         }
         const data = await response.json();
         return data;
-    }
+    } */
+
+
     useEffect(() => {
         getTodos();
     }, [])
