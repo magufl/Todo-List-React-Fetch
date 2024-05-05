@@ -2,10 +2,20 @@ import React, { useEffect, useState } from "react";
 
 
 export const ToDoJPH = () => {
-    const [todos, setTodos] = useState();
+    const [tarea, setTarea] = useState(" ");
+    const [listado, setListado] = useState();
+    const [currentTodo, setCurrentTodo] = useState({});
+    const [edit, setEdit] = useState(false);
     const host = 'https://playground.4geeks.com/todo';
     const user = 'magufl'
 
+    //crear funcion que cree usuario
+
+
+
+
+    //FUNCIONES FETCH
+    //1. TRAER TODOS
     const getTodos = async () => {
         const uri = `${host}/users/${user}`;
         const options = {
@@ -21,19 +31,29 @@ export const ToDoJPH = () => {
             return
         }
         const data = await response.json()
-        setTodos(data.todos)
-        console.log(uri)
-        console.log(data.users)
-        console.log(data.todos)
+        setListado(data.todos)
+        console.log('data:', data);
     }
-
-/*     const postTodo = async () => {
-        const uri = host + '/todos/';
+    //2. POST TODOS
+    const postTodo = async (todo) => {
+        const uri = host + '/todos/' + user;
         const options = {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(todo)
         };
-    } */
-
+        const response = await fetch(uri, options);
+        if (!response.ok) {
+            console.log('Error: ', response.status, response.statusText);
+            return
+        }
+        const data = await response.json()
+        setTarea('');
+        getTodos();
+    }
+    //3. DELETE TODOS
     const deteleTodo = async (item) => {
         const uri = `${host}/todos/${item.id}`;
         const options = {
@@ -44,15 +64,50 @@ export const ToDoJPH = () => {
             console.log('Error: ', response.status, response.statusText);
             return
         }
-        //const data = await response.json();
         getTodos();
     }
+    //4. EDIT TODOS
+    const editTodo = async (item) => {
+        setCurrentTodo(item);
+        setEdit(true)
+    }
 
-/*     const editTodo = async (item) => {
-        const uri = '';
-        const options = {
 
+
+
+
+    //FUNCIONES HANDLE
+    // 1. MANDAR TODO
+    const handleAddTodo = (event) => {
+        event.preventDefault();
+        if (tarea.trim() !== '') {
+            const newTodo = {
+                label: tarea,
+                is_done: false
+            }
+            postTodo(newTodo)
+        } else {
+            setTarea('');
         }
+    }
+
+    // 2. EDITAR TODO
+    const handleEdditTodo = async (event) => {
+        event.preventDefault();
+
+        const dataToSend = {
+            label: currentTodo.label,
+            is_done: currentTodo.is_done
+          }
+
+        const uri = `${host}/todos/${item.id}`;
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        };
         const response = await fetch(uri, options);
         if (!response.ok) {
             console.log('Error: ', response.status, response.statusText);
@@ -60,38 +115,52 @@ export const ToDoJPH = () => {
         }
         const data = await response.json();
         return data;
-    } */
+        getTodos()
+
+    }
+
+
 
 
     useEffect(() => {
+        //llamar funcion crea usuario
         getTodos();
     }, [])
 
     return (
         <div className="container text-start">
             <h1 className="text-center">ToDo JPH</h1>
+            <form className="my-2" onSubmit={handleAddTodo}>
+                <h1 className="text-center">Your To Do list👇</h1>
+                <div className="mb-3 ">
+                    <input type="text" className="form-control" id="tarea-input" placeholder="Add your new task" aria-describedby="emailHelp" value={tarea} onChange={(event) => setTarea(event.target.value)} />
+                </div>
+            </form>
             <>
-                {!todos ? <p>No tengo nada</p> :
+                {!listado ? <p>No tengo nada</p> :
                     <ul className="list-group">
-                        {todos.map((item) =>
+                        {listado.map((item) =>
                             <li key={item.id} className="list-group-item d-flex justify-content-between hidden-icon">
+                                {item.label} - Con ID num: {item.id}
                                 <div>
-                                    <div className="d-flex justify-content-between">
-                                    {item.label}
-                                    
                                     <span onClick={() => editTodo(item)} className="me-2">
                                         <i className="fas fa-edit text-success"></i>
                                     </span>
                                     <span onClick={() => deteleTodo(item)}>
                                         <i className="fas fa-trash text-danger"></i>
                                     </span>
-                                    </div>
                                 </div>
                             </li>
                         )}
+                        <li className="list-group-item text-end bg-light fw-lighter">
+                            {listado.length} pending tasks
+                        </li>
                     </ul>
                 }
             </>
         </div>
     )
+
+
+
 }
